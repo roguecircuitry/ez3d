@@ -1,5 +1,4 @@
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-import { vec } from "./vector.js";
+import { RGBAWrite, vec, Vec2Write, Vec3Write } from "./vector.js";
 function normal(a, b, c, out) {
   let ab = {
     x: 0,
@@ -17,29 +16,79 @@ function normal(a, b, c, out) {
   return out;
 }
 export class MeshBuilder {
+  // trindex: number;
+
   constructor() {
-    _defineProperty(this, "positions", []);
-    _defineProperty(this, "normals", []);
-    _defineProperty(this, "indices", []);
+    // this.trindex = 0;
+    this.clear();
   }
-  tri(a, b, c) {
-    this.positions.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
-    let n = {
-      x: 0,
-      y: 0,
-      z: 0
-    };
-    normal(a, b, c, n);
-    this.normals.push(n.x, n.y, n.z);
-    const startIndex = this.positions.length / 3;
-    this.indices.push(startIndex, startIndex + 1, startIndex + 2);
+  clear() {
+    this._vertices = new Array();
+    this._normals = new Array();
+    this._indices = new Array();
+    this._colors = new Array();
+    this._uvs = new Array();
+  }
+  verts(...verts) {
+    this._vertices.push(...verts);
     return this;
   }
-  build(out) {
-    out.positions = this.positions;
-    out.normals = this.normals;
-    out.indices = this.indices;
-    out.build();
+  uvs(...uvs) {
+    this._uvs.push(...uvs);
+    return this;
+  }
+  normals(...ns) {
+    this._normals.push(...ns);
+    return this;
+  }
+  colors(...cs) {
+    this._colors.push(...cs);
+    return this;
+  }
+  indices(...inds) {
+    this._indices.push(...inds);
+    return this;
+  }
+  build(config) {
+    let i;
+    let vertices;
+    if (config.output.vertices) vertices = new Array(this._vertices.length * 3);
+    i = 0;
+    for (let v of this._vertices) {
+      Vec3Write(v, vertices, i);
+      i += 3;
+    }
+    let colors;
+    if (config.output.colors) colors = new Array(this._colors.length * 4);
+    i = 0;
+    for (let v of this._colors) {
+      RGBAWrite(v, colors, i);
+      i += 4;
+    }
+    let uvs;
+    if (config.output.uvs) uvs = new Array(this._uvs.length * 2);
+    i = 0;
+    for (let v of this._uvs) {
+      Vec2Write(v, uvs, i);
+      i += 2;
+    }
+    let normals;
+    if (config.output.normals) normals = new Array(this._normals.length * 3);
+    i = 0;
+    for (let v of this._normals) {
+      Vec3Write(v, normals, i);
+      i += 3;
+    }
+    let indices;
+    if (config.output.indices) indices = new Array(this._indices.length * 3);
+    i = 0;
+    for (let v of this._indices) {
+      Vec3Write(v, indices, i);
+      i += 3;
+    }
+
+    //TODO handle optional params, also handle UVs and normals
+    config.output.mesh.updateVertexData(config.gl, vertices, indices, colors);
     return this;
   }
 }

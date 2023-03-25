@@ -1,3 +1,18 @@
+export function Vec2Write(v, a, offset) {
+  a[offset] = v.x;
+  a[offset + 1] = v.y;
+}
+export function Vec3Write(v, a, offset) {
+  a[offset] = v.x;
+  a[offset + 1] = v.y;
+  a[offset + 2] = v.z;
+}
+export function RGBAWrite(v, a, offset) {
+  a[offset] = v.r;
+  a[offset + 1] = v.g;
+  a[offset + 2] = v.b;
+  a[offset + 3] = v.a;
+}
 export const vec = {
   v: {
     x: 0,

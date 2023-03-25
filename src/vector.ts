@@ -1,8 +1,33 @@
 
-export interface Vec3Like {
+export interface Vec2Like {
   x: number;
   y: number;
+}
+export function Vec2Write (v: Vec2Like, a: Array<number>, offset: number) {
+  a[offset] = v.x;
+  a[offset+1] = v.y;
+}
+
+export interface Vec3Like extends Vec2Like {
   z: number;
+}
+export function Vec3Write (v: Vec3Like, a: Array<number>, offset: number) {
+  a[offset] = v.x;
+  a[offset+1] = v.y;
+  a[offset+2] = v.z;
+}
+
+export interface RGBALike {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+}
+export function RGBAWrite (v: RGBALike, a: Array<number>, offset: number) {
+  a[offset] = v.r;
+  a[offset+1] = v.g;
+  a[offset+2] = v.b;
+  a[offset+3] = v.a;
 }
 
 export const vec = {

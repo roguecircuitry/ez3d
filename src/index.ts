@@ -1,6 +1,7 @@
 
 import { exponent, UIBuilder } from "@roguecircuitry/htmless";
 import { Mesh } from "./mesh.js";
+import { MeshBuilder } from "./meshbuilder.js";
 import { Shader } from "./shader.js";
 import { CONSTS, debounce, resize } from "./utils.js";
 
@@ -72,27 +73,70 @@ async function main() {
     0, 0, 1, 1
   ]);
 
+  let mb = new MeshBuilder();
+
+  let radius = 1;
+  let divisions = 32;
+  mb.verts({x:0,y:0,z:0}); //center
+  for (let i=0; i<divisions+1; i++) {
+    let a = (i/divisions) * Math.PI * 2;
+
+    //point on circle
+    mb.verts({
+      x: Math.cos(a) * radius,
+      y: Math.sin(a) * radius,
+      z: 0
+    });
+
+    //triangle from center, point on circle, and next point along circle (or first point if we're on last point now)
+    mb.indices({
+      x: 0,
+      y: i,
+      z: i==divisions ? 1 : i+1
+    });
+
+    mb.colors({
+      r: Math.random(),
+      g: Math.random(),
+      b: Math.random(),
+      a:1
+    });
+
+  }
+
   //demo updating mesh data on the fly
   setTimeout(() => {
 
     //similar to mesh constructor, but just updates mesh with new data
     //this time it will be a square
-    mesh.updateVertexData(gl, [
-      -1, 1, 0,
-      -1, -1, 0,
-      1, 1, 0,
-      1, -1, 0
-    ], [
-      0, 1, 2,
-      1, 3, 2
-    ], [
-      1, 0, 0, 1,
-      0, 1, 0, 1,
-      0, 0, 1, 1,
-      1, 0, 0, 1
-    ]);
+    // mesh.updateVertexData(gl, [
+    //   -1, 1, 0,
+    //   -1, -1, 0,
+    //   1, 1, 0,
+    //   1, -1, 0
+    // ], [
+    //   0, 1, 2,
+    //   1, 3, 2
+    // ], [
+    //   1, 0, 0, 1,
+    //   0, 1, 0, 1,
+    //   0, 0, 1, 1,
+    //   1, 0, 0, 1
+    // ]);
 
-  }, 5000);
+    mb.build({
+      gl,
+      output: {
+        mesh,
+        colors: true,
+        indices: true,
+        normals: false,
+        uvs: false,
+        vertices: true
+      }
+    })
+
+  }, 2000);
 
 
   function render() {
