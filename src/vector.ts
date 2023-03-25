@@ -42,6 +42,7 @@ export interface HSVLike {
   v: number;
 }
 
+/**Modified from ChatGPT's generation*/
 export function hsvToRgb(hsv: HSVLike, out: RGBALike) {
   let r: number, g: number, b: number;
   let {h,s,v} = hsv;

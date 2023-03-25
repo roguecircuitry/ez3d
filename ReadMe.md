@@ -4,6 +4,8 @@ Another minimal webgl lib, written with lots of help from ChatGPT
 
 The library is not ready for any kind of production yet, but feel free to poke around the code if you're interested in learning some webgl
 
+![img](./example.png)
+
 ## Example
 See [index.ts](./index.ts) for more in depth example
 
