@@ -1,12 +1,10 @@
 export class Shader {
-  constructor(gl, vertexShaderSource, fragmentShaderSource) {
-    this.gl = gl;
+  constructor(vertexShaderSource, fragmentShaderSource) {
     this.vertexShaderSource = vertexShaderSource;
     this.fragmentShaderSource = fragmentShaderSource;
     this.program = null;
   }
-  createProgram() {
-    const gl = this.gl;
+  createProgram(gl) {
     const vertexShader = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(vertexShader, this.vertexShaderSource);
     gl.compileShader(vertexShader);
@@ -32,7 +30,7 @@ export class Shader {
     this.program = program;
     return program;
   }
-  useShader() {
-    this.gl.useProgram(this.program);
+  use(gl) {
+    gl.useProgram(this.program);
   }
 }

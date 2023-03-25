@@ -1,19 +1,16 @@
 
 export class Shader {
-  private gl: WebGLRenderingContext;
   private vertexShaderSource: string;
   private fragmentShaderSource: string;
   public program: WebGLProgram;
 
-  constructor(gl: WebGLRenderingContext, vertexShaderSource: string, fragmentShaderSource: string) {
-    this.gl = gl;
+  constructor(vertexShaderSource: string, fragmentShaderSource: string) {
     this.vertexShaderSource = vertexShaderSource;
     this.fragmentShaderSource = fragmentShaderSource;
     this.program = null;
   }
 
-  createProgram() {
-    const gl = this.gl;
+  createProgram(gl: WebGLRenderingContext) {
     const vertexShader = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(vertexShader, this.vertexShaderSource);
     gl.compileShader(vertexShader);
@@ -42,7 +39,7 @@ export class Shader {
     this.program = program;
     return program;
   }
-  useShader() {
-    this.gl.useProgram(this.program);
+  use(gl: WebGLRenderingContext) {
+    gl.useProgram(this.program);
   }
 }

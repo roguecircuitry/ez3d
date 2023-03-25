@@ -32,7 +32,7 @@ export interface MeshBuffers {
 }
 
 export class Mesh {
-  private gl: WebGLRenderingContext;
+  // private gl: WebGLRenderingContext;
 
   shader: Shader;
 
@@ -44,42 +44,48 @@ export class Mesh {
   private colors: Float32Array;
   
   constructor(gl: WebGLRenderingContext, shader: Shader, vertices: number[], indices: number[], colors: number[]) {
-    this.gl = gl;
     this.shader = shader;
     this.buffers = {};
-
+    
+    //initial geometry set here
     this.updateVertexData(gl, vertices, indices, colors);
-
+    
+    //attributes so shader knows how to talk about our geometry
     this.attribs = {};
 
-
-    this.configureAttribute(CONSTS.aVertex, {
+    this.configureAttribute(gl, CONSTS.aVertex, {
       size: 3,
       type: gl.FLOAT,
       normalized: false
     });
 
-    this.configureAttribute(CONSTS.aColor, {
+    this.configureAttribute(gl, CONSTS.aColor, {
       size: 4,
       type: gl.FLOAT,
       normalized: false
     });
   }
 
+  /**Tell the GPU we need a GPU side storage and we'd like it now plz*/
   public allocateBuffer(gl: WebGLRenderingContext, buffer: MeshBuffer) {
     buffer.buffer = gl.createBuffer();
     return this;
   }
 
+  /**Tell the GPU we want to talk about a specific 'buffer'*/
   public referenceBuffer (gl: WebGLRenderingContext, buffer: MeshBuffer) {
     gl.bindBuffer(buffer.bufferType, buffer.buffer);
     return this;
   }
 
+  /**Tell GPU to move buffer.data (created on CPU by code) to buffer.buffer (allocated on GPU by webgl)*/
   public dataToBuffer (gl: WebGLRenderingContext, buffer: MeshBuffer) {
     gl.bufferData(buffer.bufferType, buffer.data, buffer.usage);
   }
 
+  /**Tell GPU the free up a buffer, we won't be utilizing its data ever again
+   * Does nothing if the WebGLBuffer hasn't been created yet
+   */
   public tryDeallocateBuffer (gl: WebGLRenderingContext, buffer: MeshBuffer) {
     if (buffer && buffer.buffer) {
       gl.deleteBuffer(buffer.buffer);
@@ -87,7 +93,9 @@ export class Mesh {
     return this;
   }
 
-  /**Automatic handle of creation or recreation of buffers, such as position or color*/
+  /**Initialize a buffer, either for the first time, or updating existing buffer
+   * Useful for added data per vertex, such as position, color, uvs, indices, etc
+   */
   public configureBuffer(gl: WebGLRenderingContext, id: string, config: MeshBuffer) {
     let buffer = {} as MeshBuffer;
     Object.assign(buffer, config);
@@ -109,14 +117,20 @@ export class Mesh {
     return this;
   }
 
-  public configureAttribute(id: string, config: MeshAttrib) {
+  /**Initialize an attribute, either for the first time, or updating existing attribute
+   * config will be cloned to reduce confusion. you should update attributes by calling configureAttribute again, not by modifying the obj passed as 'config'
+   */
+  public configureAttribute(gl: WebGLRenderingContext, id: string, config: MeshAttrib) {
     let objClone = {} as MeshAttrib;
     Object.assign(objClone, config);
     this.attribs[id] = objClone;
-    objClone.location = this.gl.getAttribLocation(this.shader.program, id);
+    objClone.location = gl.getAttribLocation(this.shader.program, id);
     return this;
   }
 
+  /**Convenience function for updating the mesh with different geometry
+   * Safe to call even if no previous buffers/etc, this is actually called in the constructor of Mesh class
+   */
   updateVertexData(gl: WebGLRenderingContext, vertices: number[], indices: number[], colors: number[]) {
 
     this.vertices = new Float32Array(vertices);
@@ -147,10 +161,12 @@ export class Mesh {
     });
   }
 
+  /**Get an attribute by its id*/
   public getAttribute(id: string): MeshAttrib {
     return this.attribs[id];
   }
 
+  /**activate an attribute for the purpose of rendering with its data*/
   public enableAttribute(gl: WebGLRenderingContext, id: string) {
     let attrib = this.attribs[id];
 
@@ -159,12 +175,13 @@ export class Mesh {
     gl.vertexAttribPointer(attrib.location, attrib.size, attrib.type, attrib.normalized, attrib.stride, attrib.offset);
   }
 
+  /**Get a buffer by its id*/
   public getBuffer (id: string) {
     return this.buffers[id];
   }
 
-  public draw() {
-    const gl = this.gl;
+  /**Render the mesh*/
+  public draw(gl: WebGLRenderingContext) {
 
     // Use the program
     gl.useProgram(this.shader.program);

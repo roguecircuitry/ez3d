@@ -1,33 +1,48 @@
 import { CONSTS } from "./utils.js";
 export class Mesh {
+  // private gl: WebGLRenderingContext;
+
   constructor(gl, shader, vertices, indices, colors) {
-    this.gl = gl;
     this.shader = shader;
     this.buffers = {};
+
+    //initial geometry set here
     this.updateVertexData(gl, vertices, indices, colors);
+
+    //attributes so shader knows how to talk about our geometry
     this.attribs = {};
-    this.configureAttribute(CONSTS.aVertex, {
+    this.configureAttribute(gl, CONSTS.aVertex, {
       size: 3,
       type: gl.FLOAT,
       normalized: false
     });
-    this.configureAttribute(CONSTS.aColor, {
+    this.configureAttribute(gl, CONSTS.aColor, {
       size: 4,
       type: gl.FLOAT,
       normalized: false
     });
   }
+
+  /**Tell the GPU we need a GPU side storage and we'd like it now plz*/
   allocateBuffer(gl, buffer) {
     buffer.buffer = gl.createBuffer();
     return this;
   }
+
+  /**Tell the GPU we want to talk about a specific 'buffer'*/
   referenceBuffer(gl, buffer) {
     gl.bindBuffer(buffer.bufferType, buffer.buffer);
     return this;
   }
+
+  /**Tell GPU to move buffer.data (created on CPU by code) to buffer.buffer (allocated on GPU by webgl)*/
   dataToBuffer(gl, buffer) {
     gl.bufferData(buffer.bufferType, buffer.data, buffer.usage);
   }
+
+  /**Tell GPU the free up a buffer, we won't be utilizing its data ever again
+   * Does nothing if the WebGLBuffer hasn't been created yet
+   */
   tryDeallocateBuffer(gl, buffer) {
     if (buffer && buffer.buffer) {
       gl.deleteBuffer(buffer.buffer);
@@ -35,7 +50,9 @@ export class Mesh {
     return this;
   }
 
-  /**Automatic handle of creation or recreation of buffers, such as position or color*/
+  /**Initialize a buffer, either for the first time, or updating existing buffer
+   * Useful for added data per vertex, such as position, color, uvs, indices, etc
+   */
   configureBuffer(gl, id, config) {
     let buffer = {};
     Object.assign(buffer, config);
@@ -55,13 +72,21 @@ export class Mesh {
     this.dataToBuffer(gl, buffer);
     return this;
   }
-  configureAttribute(id, config) {
+
+  /**Initialize an attribute, either for the first time, or updating existing attribute
+   * config will be cloned to reduce confusion. you should update attributes by calling configureAttribute again, not by modifying the obj passed as 'config'
+   */
+  configureAttribute(gl, id, config) {
     let objClone = {};
     Object.assign(objClone, config);
     this.attribs[id] = objClone;
-    objClone.location = this.gl.getAttribLocation(this.shader.program, id);
+    objClone.location = gl.getAttribLocation(this.shader.program, id);
     return this;
   }
+
+  /**Convenience function for updating the mesh with different geometry
+   * Safe to call even if no previous buffers/etc, this is actually called in the constructor of Mesh class
+   */
   updateVertexData(gl, vertices, indices, colors) {
     this.vertices = new Float32Array(vertices);
     this.indices = new Uint16Array(indices);
@@ -89,21 +114,27 @@ export class Mesh {
       usage: gl.STATIC_DRAW
     });
   }
+
+  /**Get an attribute by its id*/
   getAttribute(id) {
     return this.attribs[id];
   }
+
+  /**activate an attribute for the purpose of rendering with its data*/
   enableAttribute(gl, id) {
     let attrib = this.attribs[id];
     if (!attrib.location) attrib.location = gl.getAttribLocation(this.shader.program, id);
     gl.enableVertexAttribArray(attrib.location);
     gl.vertexAttribPointer(attrib.location, attrib.size, attrib.type, attrib.normalized, attrib.stride, attrib.offset);
   }
+
+  /**Get a buffer by its id*/
   getBuffer(id) {
     return this.buffers[id];
   }
-  draw() {
-    const gl = this.gl;
 
+  /**Render the mesh*/
+  draw(gl) {
     // Use the program
     gl.useProgram(this.shader.program);
 
