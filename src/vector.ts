@@ -9,7 +9,7 @@ export const vec = {
   v: {x: 0, y: 0, z: 0} as Vec3Like,
   arrayRef: undefined as Array<number>,
   arrayIndex: 0,
-
+  
   add (o: Vec3Like) {
     vec.v.x += o.x;
     vec.v.y += o.y;
