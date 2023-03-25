@@ -4,6 +4,7 @@ import { Mesh } from "./mesh.js";
 import { MeshBuilder } from "./meshbuilder.js";
 import { Shader } from "./shader.js";
 import { CONSTS, debounce, resize } from "./utils.js";
+import { hsvToRgb, RGBALike } from "./vector.js";
 
 async function main() {
   //easier HTML output, thanks to htmless
@@ -76,10 +77,15 @@ async function main() {
   let mb = new MeshBuilder();
 
   let radius = 1;
-  let divisions = 32;
-  mb.verts({x:0,y:0,z:0}); //center
-  for (let i=0; i<divisions+1; i++) {
-    let a = (i/divisions) * Math.PI * 2;
+  let divisions = 64;
+  mb.verts({ x: 0, y: 0, z: 0 }); //center
+  mb.colors({ r: 1, g: 1, b: 1, a: 1 });
+
+  let hsv = { h: 0, s: 1, v: 1 };
+
+  for (let i = 0; i < divisions + 1; i++) {
+    let by = (i / divisions);
+    let a = by * Math.PI * 2;
 
     //point on circle
     mb.verts({
@@ -92,15 +98,16 @@ async function main() {
     mb.indices({
       x: 0,
       y: i,
-      z: i==divisions ? 1 : i+1
+      z: i == divisions ? 1 : i + 1
     });
 
-    mb.colors({
-      r: Math.random(),
-      g: Math.random(),
-      b: Math.random(),
-      a:1
-    });
+    hsv.h = (by*5)%5;
+
+    let currentColor: RGBALike = { r: 0, g: 0, b: 0, a: 1 };
+
+    hsvToRgb(hsv, currentColor);
+
+    mb.colors(currentColor);
 
   }
 
@@ -124,6 +131,7 @@ async function main() {
     //   1, 0, 0, 1
     // ]);
 
+    //build to our mesh with the generated circle geometry
     mb.build({
       gl,
       output: {

@@ -3,6 +3,7 @@ import { Mesh } from "./mesh.js";
 import { MeshBuilder } from "./meshbuilder.js";
 import { Shader } from "./shader.js";
 import { CONSTS, debounce, resize } from "./utils.js";
+import { hsvToRgb } from "./vector.js";
 async function main() {
   //easier HTML output, thanks to htmless
   let ui = new UIBuilder();
@@ -62,14 +63,26 @@ async function main() {
   let mesh = new Mesh(gl, shader, [0.0, 0.5, 0.0, -0.5, -0.5, 0.0, 0.5, -0.5, 0.0], [0, 1, 2], [1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1]);
   let mb = new MeshBuilder();
   let radius = 1;
-  let divisions = 32;
+  let divisions = 64;
   mb.verts({
     x: 0,
     y: 0,
     z: 0
   }); //center
+  mb.colors({
+    r: 1,
+    g: 1,
+    b: 1,
+    a: 1
+  });
+  let hsv = {
+    h: 0,
+    s: 1,
+    v: 1
+  };
   for (let i = 0; i < divisions + 1; i++) {
-    let a = i / divisions * Math.PI * 2;
+    let by = i / divisions;
+    let a = by * Math.PI * 2;
 
     //point on circle
     mb.verts({
@@ -84,12 +97,15 @@ async function main() {
       y: i,
       z: i == divisions ? 1 : i + 1
     });
-    mb.colors({
-      r: Math.random(),
-      g: Math.random(),
-      b: Math.random(),
+    hsv.h = by * 5 % 5;
+    let currentColor = {
+      r: 0,
+      g: 0,
+      b: 0,
       a: 1
-    });
+    };
+    hsvToRgb(hsv, currentColor);
+    mb.colors(currentColor);
   }
 
   //demo updating mesh data on the fly
@@ -111,6 +127,7 @@ async function main() {
     //   1, 0, 0, 1
     // ]);
 
+    //build to our mesh with the generated circle geometry
     mb.build({
       gl,
       output: {
