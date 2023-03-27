@@ -7,6 +7,7 @@ import { Shader } from "./shader.js";
 import { CONSTS, debounce, resize } from "./utils.js";
 import { Node } from "./graph/node.js";
 import { SceneNode } from "./graph/scene.js";
+import { MeshNode } from "./graph/meshnode.js";
 
 async function main() {
   //easier HTML output, thanks to htmless
@@ -62,10 +63,19 @@ async function main() {
   //compile the shader, creates 'program' member used by webgl
   shader.createProgram(gl);
 
+  let scene = new SceneNode();
+
   //create a mesh with default geometry
   //just a triangle to start with
-  let mesh = new Mesh(shader);
+  // let mesh = new Mesh(shader);
+  // mesh.init(gl);
+
+  let meshnode = new MeshNode();
+  let mesh = meshnode.mesh;
+  mesh.shader = shader;
   mesh.init(gl);
+
+  scene.add(meshnode);
 
   let mb = new MeshBuilder();
 
@@ -121,9 +131,6 @@ async function main() {
 
   }, 2000);
 
-
-  let scene = new SceneNode();
-
   function render() {
     //set the clear color
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -133,7 +140,7 @@ async function main() {
     scene.render(gl);
 
     //Tell mesh to render with its shader
-    mesh.draw(gl);
+    // mesh.draw(gl);
 
     //keep drawing more frames plz
     requestAnimationFrame(render);

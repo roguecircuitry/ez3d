@@ -42,4 +42,8 @@ export class Node {
 
     if (this.onUserRender) this.onUserRender(gl);
   }
+  add (child: Node): this {
+    this.children.add(child);
+    return this;
+  }
 }

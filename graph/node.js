@@ -28,4 +28,8 @@ export class Node {
     }
     if (this.onUserRender) this.onUserRender(gl);
   }
+  add(child) {
+    this.children.add(child);
+    return this;
+  }
 }
