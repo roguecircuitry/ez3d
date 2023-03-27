@@ -11,7 +11,7 @@ export const Mat4FloatCount = 16;
 export const mat4 = {
   m: new Float32Array(Mat4FloatCount),
   create() {
-    let result = new Float32Array(Mat4FloatCount);
+    let result = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
     return result;
   },
   store(m, offset = 0) {

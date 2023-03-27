@@ -12,7 +12,7 @@ export class Transform {
 
   constructor () {
     this.position = vec.create();
-    this.scale = vec.create();
+    this.scale = vec.create(1,1,1);
     this.rotation = quat.create();
 
     this.matrix = mat4.create();

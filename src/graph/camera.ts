@@ -1,6 +1,6 @@
 
-import { mat4, Mat4Like } from "../math/matrix";
-import { Node } from "./node.js";
+import { mat4, Mat4Like } from "../math/matrix.js";
+import { Node, RenderConfig } from "./node.js";
 
 export type CameraType = "orthographic"|"perspective";
 
@@ -12,7 +12,10 @@ export class Camera extends Node {
 
   private _projectionMatrixDirty: boolean;
   private projectionMatrix: Mat4Like;
-  private viewProjectionMatrix: Mat4Like;
+  private _viewProjectionMatrix: Mat4Like;
+  get viewProjectionMatrix () {
+    return this._viewProjectionMatrix;
+  }
 
   private _fieldOfView: number;
   get fieldOfView (): number {
@@ -101,24 +104,30 @@ export class Camera extends Node {
   constructor () {
     super();
     this.projectionMatrix = mat4.create();
-    this.viewProjectionMatrix = mat4.create();
+    this._viewProjectionMatrix = mat4.create();
 
     this.setPerspective(70, 1, 0.01, 100);
   }
 
-  protected _render(gl: WebGLRenderingContext): void {
-    super._render(gl);
+  protected _render(cfg: RenderConfig): void {
+    super._render(cfg);
     
     if (this._projectionMatrixDirty) {
       if (this._type === "orthographic") {
-        mat4.orthographic(this._left, this._right, this._bottom, this._top, this._near, this._far);
+        mat4.orthographic(this._left, this._right, this._bottom, this._top, this._near, this._far).store(this.projectionMatrix);
       } else {
-        mat4.perspective(this._fieldOfView, this._aspect, this._near, this._far);
+        mat4.perspective(this._fieldOfView, this._aspect, this._near, this._far).store(this.projectionMatrix);
       }
+      console.log("recalc camera proj");
       this._projectionMatrixDirty = false;
     }
 
     //calculate view + projection matrix
-    mat4.copy(this.transform.global.matrix).mul(this.projectionMatrix).store(this.viewProjectionMatrix);
+    // console.log("camera xfrm", ...this.transform.global.matrix);
+
+    mat4.copy(this.transform.global.matrix)
+    // .mul(this.projectionMatrix)
+    .store(this._viewProjectionMatrix);
+    // console.log(...this._viewProjectionMatrix);
   }
 }

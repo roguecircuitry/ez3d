@@ -1,8 +1,11 @@
-import { mat4 } from "../math/matrix";
+import { mat4 } from "../math/matrix.js";
 import { Node } from "./node.js";
 export class Camera extends Node {
   get type() {
     return this._type;
+  }
+  get viewProjectionMatrix() {
+    return this._viewProjectionMatrix;
   }
   get fieldOfView() {
     return this._fieldOfView;
@@ -77,21 +80,27 @@ export class Camera extends Node {
   constructor() {
     super();
     this.projectionMatrix = mat4.create();
-    this.viewProjectionMatrix = mat4.create();
+    this._viewProjectionMatrix = mat4.create();
     this.setPerspective(70, 1, 0.01, 100);
   }
-  _render(gl) {
-    super._render(gl);
+  _render(cfg) {
+    super._render(cfg);
     if (this._projectionMatrixDirty) {
       if (this._type === "orthographic") {
-        mat4.orthographic(this._left, this._right, this._bottom, this._top, this._near, this._far);
+        mat4.orthographic(this._left, this._right, this._bottom, this._top, this._near, this._far).store(this.projectionMatrix);
       } else {
-        mat4.perspective(this._fieldOfView, this._aspect, this._near, this._far);
+        mat4.perspective(this._fieldOfView, this._aspect, this._near, this._far).store(this.projectionMatrix);
       }
+      console.log("recalc camera proj");
       this._projectionMatrixDirty = false;
     }
 
     //calculate view + projection matrix
-    mat4.copy(this.transform.global.matrix).mul(this.projectionMatrix).store(this.viewProjectionMatrix);
+    // console.log("camera xfrm", ...this.transform.global.matrix);
+
+    mat4.copy(this.transform.global.matrix)
+    // .mul(this.projectionMatrix)
+    .store(this._viewProjectionMatrix);
+    // console.log(...this._viewProjectionMatrix);
   }
 }

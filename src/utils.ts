@@ -26,7 +26,10 @@ export const CONSTS = {
   /**WebGLBuffer for indices*/
   bIndices: "bIndices",
   /**WebGLBuffer for colors*/
-  bColors: "bColors"
+  bColors: "bColors",
+  
+  /**Model transform + camera view + camera projection matrix*/
+  uTransViewProjMatrix: "uTransViewProjMatrix"
 };
 
 export interface AssignTransformer<T> {

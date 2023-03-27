@@ -1,4 +1,5 @@
 
+import { Mat4Like } from "./math/matrix.js";
 import { Shader } from "./shader.js";
 import { CONSTS } from "./utils.js";
 
@@ -195,7 +196,7 @@ export class Mesh {
   }
 
   /**Render the mesh*/
-  public draw(gl: WebGLRenderingContext): boolean {
+  public draw(gl: WebGLRenderingContext, uTransViewProjMat4: Mat4Like): boolean {
 
     if (!this.shader) return false;
 
@@ -215,6 +216,10 @@ export class Mesh {
     this.referenceBuffer(gl, this.getBuffer(CONSTS.bColors));
     // Enable the vertex color attribute
     this.enableAttribute(gl, CONSTS.aColor);
+
+    //pass in matrix to shader uniforms
+    const uTransViewProjMatrixLocation = gl.getUniformLocation(this.shader.program, CONSTS.uTransViewProjMatrix);
+    gl.uniformMatrix4fv(uTransViewProjMatrixLocation, false, uTransViewProjMat4);
 
     // Draw the mesh
     gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);

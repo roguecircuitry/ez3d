@@ -1,19 +1,25 @@
 
+import { mat4, Mat4Like } from "../math/matrix.js";
 import { Mesh } from "../mesh.js";
-import { Node } from "./node.js"; //not to be confused with node.js ...
+import { Node, RenderConfig } from "./node.js"; //not to be confused with node.js ...
 
 export class MeshNode extends Node {
   mesh: Mesh;
+  /**Transform + camera view + camera projection matrix*/
+  tvpMatrix: Mat4Like;
 
   constructor () {
     super();
-
+    this.tvpMatrix = mat4.create();
+    
     this.mesh = new Mesh();
 
   }
-  protected _render(gl: WebGLRenderingContext): void {
-    super._render(gl);
-    this.mesh.draw(gl);
+  protected _render(cfg: RenderConfig): void {
+    super._render(cfg);
+    mat4.copy(this.transform.global.matrix).mul(cfg.camera.viewProjectionMatrix).store(this.tvpMatrix);
+    console.log(...this.tvpMatrix);
+    this.mesh.draw(cfg.gl, this.tvpMatrix);
   }
 
 }

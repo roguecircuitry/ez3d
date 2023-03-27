@@ -3,7 +3,7 @@ export class SceneNode extends Node {
   constructor() {
     super();
   }
-  render(gl) {
-    super._render(gl);
+  render(cfg) {
+    super._render(cfg);
   }
 }

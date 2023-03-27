@@ -136,7 +136,7 @@ export class Mesh {
   }
 
   /**Render the mesh*/
-  draw(gl) {
+  draw(gl, uTransViewProjMat4) {
     if (!this.shader) return false;
 
     // Use the program
@@ -155,6 +155,10 @@ export class Mesh {
     this.referenceBuffer(gl, this.getBuffer(CONSTS.bColors));
     // Enable the vertex color attribute
     this.enableAttribute(gl, CONSTS.aColor);
+
+    //pass in matrix to shader uniforms
+    const uTransViewProjMatrixLocation = gl.getUniformLocation(this.shader.program, CONSTS.uTransViewProjMatrix);
+    gl.uniformMatrix4fv(uTransViewProjMatrixLocation, false, uTransViewProjMat4);
 
     // Draw the mesh
     gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);

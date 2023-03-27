@@ -19,7 +19,25 @@ export const mat4 = {
   m: new Float32Array(Mat4FloatCount),
 
   create(): Mat4Like {
-    let result = new Float32Array(Mat4FloatCount);
+    let result = new Float32Array([
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+    ]);
+
     return result;
   },
   store(m: Mat4Like, offset: number = 0) {

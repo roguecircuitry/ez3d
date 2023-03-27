@@ -5,6 +5,9 @@ import { Shader } from "./shader.js";
 import { CONSTS, debounce, resize } from "./utils.js";
 import { SceneNode } from "./graph/scene.js";
 import { MeshNode } from "./graph/meshnode.js";
+import { Camera } from "./graph/camera.js";
+import { quat } from "./math/quaternion.js";
+import { DEG2RAD } from "./math/general.js";
 async function main() {
   //easier HTML output, thanks to htmless
   let ui = new UIBuilder();
@@ -37,8 +40,10 @@ async function main() {
   attribute vec4 ${CONSTS.aColor};
   varying vec4 ${CONSTS.vColor}; //varying used to pass between vert to frag shader
   
+  uniform mat4 ${CONSTS.uTransViewProjMatrix};
+
   void main() {
-    gl_Position = vec4(${CONSTS.aVertex}, 1.0);
+    gl_Position = vec4(${CONSTS.aVertex}, 1.0) * ${CONSTS.uTransViewProjMatrix};
     ${CONSTS.vColor} = ${CONSTS.aColor}; // Pass the vertex color to the fragment shader
   }
 `;
@@ -59,6 +64,14 @@ async function main() {
   //compile the shader, creates 'program' member used by webgl
   shader.createProgram(gl);
   let scene = new SceneNode();
+  let camera = new Camera();
+  quat.fromEuler({
+    x: 0,
+    y: 0,
+    z: 90 * DEG2RAD
+  }).store(camera.transform.local.rotation);
+  camera.transform.local.position.z = -0.5;
+  scene.add(camera);
 
   //create a mesh with default geometry
   //just a triangle to start with
@@ -132,15 +145,28 @@ async function main() {
       }
     });
   }, 2000);
+  let renderConfig = {
+    camera,
+    gl,
+    scene
+  };
+  let r = 0;
   function render() {
     //set the clear color
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     // Clear the canvas
     gl.clear(gl.COLOR_BUFFER_BIT);
-    scene.render(gl);
+    r += 0.05;
+    quat.fromEuler({
+      x: 0,
+      y: r,
+      z: 0
+    }).mul(camera.transform.local.rotation).store(camera.transform.local.rotation);
 
-    //Tell mesh to render with its shader
-    // mesh.draw(gl);
+    // console.log("rot", camera.transform.local.rotation);
+
+    //render the scene
+    scene.render(renderConfig);
 
     //keep drawing more frames plz
     requestAnimationFrame(render);
