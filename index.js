@@ -1,9 +1,10 @@
 import { exponent, UIBuilder } from "@roguecircuitry/htmless";
+import { hsvToRgb } from "./math/color.js";
 import { Mesh } from "./mesh.js";
 import { MeshBuilder } from "./meshbuilder.js";
 import { Shader } from "./shader.js";
 import { CONSTS, debounce, resize } from "./utils.js";
-import { hsvToRgb } from "./vector.js";
+import { SceneNode } from "./graph/scene.js";
 async function main() {
   //easier HTML output, thanks to htmless
   let ui = new UIBuilder();
@@ -60,10 +61,11 @@ async function main() {
 
   //create a mesh with default geometry
   //just a triangle to start with
-  let mesh = new Mesh(gl, shader, [0.0, 0.5, 0.0, -0.5, -0.5, 0.0, 0.5, -0.5, 0.0], [0, 1, 2], [1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1]);
+  let mesh = new Mesh(shader);
+  mesh.init(gl);
   let mb = new MeshBuilder();
-  let radius = 1;
-  let divisions = 64;
+  let radius = 0.5;
+  let divisions = 8;
   mb.verts({
     x: 0,
     y: 0,
@@ -97,7 +99,7 @@ async function main() {
       y: i,
       z: i == divisions ? 1 : i + 1
     });
-    hsv.h = by * 5 % 5;
+    hsv.h = by;
     let currentColor = {
       r: 0,
       g: 0,
@@ -110,23 +112,7 @@ async function main() {
 
   //demo updating mesh data on the fly
   setTimeout(() => {
-    //similar to mesh constructor, but just updates mesh with new data
-    //this time it will be a square
-    // mesh.updateVertexData(gl, [
-    //   -1, 1, 0,
-    //   -1, -1, 0,
-    //   1, 1, 0,
-    //   1, -1, 0
-    // ], [
-    //   0, 1, 2,
-    //   1, 3, 2
-    // ], [
-    //   1, 0, 0, 1,
-    //   0, 1, 0, 1,
-    //   0, 0, 1, 1,
-    //   1, 0, 0, 1
-    // ]);
-
+    console.log("happens");
     //build to our mesh with the generated circle geometry
     mb.build({
       gl,
@@ -140,11 +126,13 @@ async function main() {
       }
     });
   }, 2000);
+  let scene = new SceneNode();
   function render() {
     //set the clear color
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     // Clear the canvas
     gl.clear(gl.COLOR_BUFFER_BIT);
+    scene.render(gl);
 
     //Tell mesh to render with its shader
     mesh.draw(gl);

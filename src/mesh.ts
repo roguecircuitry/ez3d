@@ -32,23 +32,40 @@ export interface MeshBuffers {
 }
 
 export class Mesh {
-  // private gl: WebGLRenderingContext;
-
   shader: Shader;
 
   attribs: MeshAttribs;
   buffers: MeshBuffers;
 
-  private vertices: Float32Array;
-  private indices: Uint16Array;
-  private colors: Float32Array;
+  vertices: Float32Array;
+  indices: Uint16Array;
+  colors: Float32Array;
   
-  constructor(gl: WebGLRenderingContext, shader: Shader, vertices: number[], indices: number[], colors: number[]) {
-    this.shader = shader;
+  constructor(shader?: Shader) {
     this.buffers = {};
-    
+
+    this.shader = shader;
+  }
+
+  init (gl: WebGLRenderingContext) {
+    this.buffers = {};
+
+    this.vertices = new Float32Array([
+      0.0, 0.5, 0.0,
+      -0.5, -0.5, 0.0,
+      0.5, -0.5, 0.0,
+    ]);
+    this.indices = new Uint16Array([
+      0, 1, 2,
+    ]);
+    this.colors = new Float32Array([
+      1, 0, 0, 1,
+      0, 1, 0, 1,
+      0, 0, 1, 1
+    ]);
+
     //initial geometry set here
-    this.updateVertexData(gl, vertices, indices, colors);
+    this.updateVertexData(gl);
     
     //attributes so shader knows how to talk about our geometry
     this.attribs = {};
@@ -130,13 +147,10 @@ export class Mesh {
 
   /**Convenience function for updating the mesh with different geometry
    * Safe to call even if no previous buffers/etc, this is actually called in the constructor of Mesh class
+   * 
+   * Simply modify this.vertices, this.indicies, etc, then call mesh.updateVertexData(gl)
    */
-  updateVertexData(gl: WebGLRenderingContext, vertices: number[], indices: number[], colors: number[]) {
-
-    this.vertices = new Float32Array(vertices);
-    this.indices = new Uint16Array(indices);
-    this.colors = new Float32Array(colors);
-    
+  updateVertexData(gl: WebGLRenderingContext) {
     // Create vertex buffer
     this.configureBuffer(gl, CONSTS.bVertices, {
       data: this.vertices,
@@ -181,7 +195,9 @@ export class Mesh {
   }
 
   /**Render the mesh*/
-  public draw(gl: WebGLRenderingContext) {
+  public draw(gl: WebGLRenderingContext): boolean {
+
+    if (!this.shader) return false;
 
     // Use the program
     gl.useProgram(this.shader.program);
@@ -202,6 +218,8 @@ export class Mesh {
 
     // Draw the mesh
     gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
+
+    return true;
   }
 }
 

@@ -1,13 +1,17 @@
 import { CONSTS } from "./utils.js";
 export class Mesh {
-  // private gl: WebGLRenderingContext;
-
-  constructor(gl, shader, vertices, indices, colors) {
-    this.shader = shader;
+  constructor(shader) {
     this.buffers = {};
+    this.shader = shader;
+  }
+  init(gl) {
+    this.buffers = {};
+    this.vertices = new Float32Array([0.0, 0.5, 0.0, -0.5, -0.5, 0.0, 0.5, -0.5, 0.0]);
+    this.indices = new Uint16Array([0, 1, 2]);
+    this.colors = new Float32Array([1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1]);
 
     //initial geometry set here
-    this.updateVertexData(gl, vertices, indices, colors);
+    this.updateVertexData(gl);
 
     //attributes so shader knows how to talk about our geometry
     this.attribs = {};
@@ -86,12 +90,10 @@ export class Mesh {
 
   /**Convenience function for updating the mesh with different geometry
    * Safe to call even if no previous buffers/etc, this is actually called in the constructor of Mesh class
+   * 
+   * Simply modify this.vertices, this.indicies, etc, then call mesh.updateVertexData(gl)
    */
-  updateVertexData(gl, vertices, indices, colors) {
-    this.vertices = new Float32Array(vertices);
-    this.indices = new Uint16Array(indices);
-    this.colors = new Float32Array(colors);
-
+  updateVertexData(gl) {
     // Create vertex buffer
     this.configureBuffer(gl, CONSTS.bVertices, {
       data: this.vertices,
@@ -135,6 +137,8 @@ export class Mesh {
 
   /**Render the mesh*/
   draw(gl) {
+    if (!this.shader) return false;
+
     // Use the program
     gl.useProgram(this.shader.program);
 
@@ -154,5 +158,6 @@ export class Mesh {
 
     // Draw the mesh
     gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
+    return true;
   }
 }
