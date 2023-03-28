@@ -8,6 +8,7 @@
  * 4. some parts missing, such as rotating matrix by quaternion, are added here added by ChatGPT - and no, i dont want to create an intermediate rotation matrix
 */
 
+import { DEG2RAD } from "./general.js";
 import { QuaternionLike } from "./quaternion.js";
 import { Vec3Like } from "./vector.js";
 
@@ -342,10 +343,8 @@ export const mat4 = {
 
     return mat4;
   },
-  perspective(fovy: number, aspect: number, near = 0.01, far = 100) {
+  perspective(fovy: number = 70*DEG2RAD, aspect: number = 1, near = 0.01, far = 100) {
     let out = mat4.m;
-
-    //from gl-matrix
     const f = 1.0 / Math.tan(fovy / 2);
     out[0] = f / aspect;
     out[1] = 0;
@@ -369,6 +368,7 @@ export const mat4 = {
       out[10] = -1;
       out[14] = -2 * near;
     }
+
     return mat4;
   },
   orthographic(left: number, right: number, bottom: number, top: number, near: number, far: number) {

@@ -7,6 +7,7 @@
  * 4. some parts missing, such as rotating matrix by quaternion, are added here added by ChatGPT - and no, i dont want to create an intermediate rotation matrix
 */
 
+import { DEG2RAD } from "./general.js";
 export const Mat4FloatCount = 16;
 export const mat4 = {
   m: new Float32Array(Mat4FloatCount),
@@ -300,10 +301,8 @@ export const mat4 = {
     }
     return mat4;
   },
-  perspective(fovy, aspect, near = 0.01, far = 100) {
+  perspective(fovy = 70 * DEG2RAD, aspect = 1, near = 0.01, far = 100) {
     let out = mat4.m;
-
-    //from gl-matrix
     const f = 1.0 / Math.tan(fovy / 2);
     out[0] = f / aspect;
     out[1] = 0;

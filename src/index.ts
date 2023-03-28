@@ -1,16 +1,15 @@
 
 import { exponent, UIBuilder } from "@roguecircuitry/htmless";
+import { Camera } from "./graph/camera.js";
+import { MeshNode } from "./graph/meshnode.js";
+import { RenderConfig } from "./graph/node.js";
+import { SceneNode } from "./graph/scene.js";
 import { hsvToRgb, RGBALike } from "./math/color.js";
-import { Mesh } from "./mesh.js";
+import { DEG2RAD, lerp } from "./math/general.js";
+import { quat } from "./math/quaternion.js";
 import { MeshBuilder } from "./meshbuilder.js";
 import { Shader } from "./shader.js";
 import { CONSTS, debounce, resize } from "./utils.js";
-import { Node, RenderConfig } from "./graph/node.js";
-import { SceneNode } from "./graph/scene.js";
-import { MeshNode } from "./graph/meshnode.js";
-import { Camera } from "./graph/camera.js";
-import { quat } from "./math/quaternion.js";
-import { DEG2RAD } from "./math/general.js";
 
 async function main() {
   //easier HTML output, thanks to htmless
@@ -33,7 +32,10 @@ async function main() {
   const gl = canvas.getContext("webgl2");
 
   // resize the canvas when window is resized, use debounce to not trigger lots of times during drag-resize
-  window.addEventListener('resize', debounce(() => resize(canvas, gl), 250));
+  window.addEventListener('resize', debounce(() => {
+    resize(canvas, gl)
+    camera.aspect = canvas.width/canvas.height;
+  }, 250));
 
   //resize manually once
   setTimeout(() => resize(canvas, gl), 1000);
@@ -47,7 +49,8 @@ async function main() {
   uniform mat4 ${CONSTS.uTransViewProjMatrix};
 
   void main() {
-    gl_Position = vec4(${CONSTS.aVertex}, 1.0) * ${CONSTS.uTransViewProjMatrix};
+    //https://stackoverflow.com/a/46410448/8112809 - order of ops matter, thank you Rabid76
+    gl_Position = ${CONSTS.uTransViewProjMatrix} * vec4(${CONSTS.aVertex}, 1.0);
     ${CONSTS.vColor} = ${CONSTS.aColor}; // Pass the vertex color to the fragment shader
   }
 `;
@@ -71,14 +74,127 @@ async function main() {
   let scene = new SceneNode();
   let camera = new Camera();
   quat.fromEuler({x:0,y:0,z:90*DEG2RAD}).store(camera.transform.local.rotation);
-  camera.transform.local.position.z = -0.5;
+  camera.transform.local.position.z = -10;
   scene.add(camera);
+  
+  let mb = new MeshBuilder();
+  let gridnode = new MeshNode();
+  gridnode.mesh.shader = shader;
+  gridnode.mesh.init(gl);
+  
+  function gridMesh (mb: MeshBuilder, size: number = 10, divs: number = 10, lineWidth: number = 0.1, color={r:0.5,g:0.5,b:0.5,a:1}) {
+    mb.clear();
+    
+    let halfSize = size/2;
+    let halfWidth = lineWidth/2;
 
-  //create a mesh with default geometry
-  //just a triangle to start with
-  // let mesh = new Mesh(shader);
-  // mesh.init(gl);
+    let x = 0;
+    let y = 0;
+    
+    let top = halfSize;
+    let bottom = -halfSize;
+    let left = -halfSize;
+    let right = halfSize;
 
+    for (let ix=0; ix<divs+1; ix++) {
+      x = lerp(left, right, ix/divs);
+      let l = x - halfWidth;
+      let r = x + halfWidth;
+      let io = ix * 4;
+      
+      mb.verts({
+        x: l,
+        y: bottom,
+        z: 0
+      },{
+        x: l,
+        y: top,
+        z: 0
+      },{
+        x: r,
+        y: top,
+        z: 0
+      },{
+        x: r,
+        y: bottom,
+        z: 0
+      });
+
+      mb.indices({
+        x: 0 + io,
+        y: 2 + io,
+        z: 1 + io
+      },{
+        x: 0 + io,
+        y: 3 + io,
+        z: 2 + io
+      });
+
+      mb.colors(
+        color,
+        color,
+        color,
+        color
+      );
+    }
+
+    for (let iy=0; iy<divs+1; iy++) {
+      y = lerp(bottom, top, iy/divs);
+      let b = y - halfWidth;
+      let t = y + halfWidth;
+      let io = (iy * 4) + ((divs+1)*4);
+      
+      mb.verts({
+        x: left,
+        y: b,
+        z: 0
+      },{
+        x: left,
+        y: t,
+        z: 0
+      },{
+        x: right,
+        y: t,
+        z: 0
+      },{
+        x: right,
+        y: b,
+        z: 0
+      });
+
+      mb.indices({
+        x: 0 + io,
+        y: 2 + io,
+        z: 1 + io
+      },{
+        x: 0 + io,
+        y: 3 + io,
+        z: 2 + io
+      });
+
+      mb.colors(
+        color,
+        color,
+        color,
+        color
+      );
+    }
+  }
+
+  gridMesh(mb, 10, 10, 0.001, {r:0.5,g:1,b:0.5,a:1});
+  mb.build({
+    gl,
+    output: {
+      mesh: gridnode.mesh,
+      vertices: true,
+      indices: true,
+      colors: true
+    }
+  });
+
+  scene.add(gridnode);
+
+  mb.clear();
   let meshnode = new MeshNode();
   let mesh = meshnode.mesh;
   mesh.shader = shader;
@@ -86,10 +202,9 @@ async function main() {
 
   scene.add(meshnode);
 
-  let mb = new MeshBuilder();
 
   let radius = 0.5;
-  let divisions = 8;
+  let divisions = 64;
   mb.verts({ x: 0, y: 0, z: 0 }); //center
   mb.colors({ r: 1, g: 1, b: 1, a: 1 });
 
@@ -138,7 +253,7 @@ async function main() {
       }
     })
 
-  }, 2000);
+  }, 500);
 
   let renderConfig: RenderConfig = {
     camera,
@@ -154,11 +269,13 @@ async function main() {
     // Clear the canvas
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    r += 0.05;
+    r += 0.005;
 
-    quat.fromEuler({x: 0, y: r, z: 0})
+    quat.fromEuler({x: r+1, y: r+2, z: r+3})
     .mul(camera.transform.local.rotation)
     .store(camera.transform.local.rotation);
+
+    // camera.transform.local.position.z = Math.sin(r);
 
     // console.log("rot", camera.transform.local.rotation);
 

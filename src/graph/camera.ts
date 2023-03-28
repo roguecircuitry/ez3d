@@ -1,4 +1,5 @@
 
+import { DEG2RAD } from "../math/general.js";
 import { mat4, Mat4Like } from "../math/matrix.js";
 import { Node, RenderConfig } from "./node.js";
 
@@ -95,7 +96,12 @@ export class Camera extends Node {
     return this;
   }
   setOrthographic (left: number, right: number, top: number, bottom: number, near: number, far: number): this {
-    
+    this._left = left;
+    this._right = right;
+    this._top = top;
+    this._bottom = bottom;
+    this._near = near;
+    this._far = far;
     this._projectionMatrixDirty = true;
     this._type = "orthographic";
     return this;
@@ -106,7 +112,16 @@ export class Camera extends Node {
     this.projectionMatrix = mat4.create();
     this._viewProjectionMatrix = mat4.create();
 
-    this.setPerspective(70, 1, 0.01, 100);
+    this.setPerspective(70 * DEG2RAD, 1, 0.1, 100);
+    let osize = 1;
+    // this.setOrthographic(
+    //   -osize,
+    //   osize,
+    //   osize,
+    //   -osize,
+    //   0.01,
+    //   100
+    // );
   }
 
   protected _render(cfg: RenderConfig): void {
@@ -123,10 +138,11 @@ export class Camera extends Node {
     }
 
     //calculate view + projection matrix
-    // console.log("camera xfrm", ...this.transform.global.matrix);
+    // console.log("cam proj", ...this.projectionMatrix);
 
-    mat4.copy(this.transform.global.matrix)
-    // .mul(this.projectionMatrix)
+    mat4
+    .copy(this.projectionMatrix)
+    .mul(this.transform.global.matrix)
     .store(this._viewProjectionMatrix);
     // console.log(...this._viewProjectionMatrix);
   }

@@ -17,8 +17,11 @@ export class MeshNode extends Node {
   }
   protected _render(cfg: RenderConfig): void {
     super._render(cfg);
-    mat4.copy(this.transform.global.matrix).mul(cfg.camera.viewProjectionMatrix).store(this.tvpMatrix);
-    console.log(...this.tvpMatrix);
+    mat4
+    .copy(cfg.camera.viewProjectionMatrix)
+    .mul(this.transform.global.matrix)
+    .store(this.tvpMatrix);
+    // console.log(...this.tvpMatrix);
     this.mesh.draw(cfg.gl, this.tvpMatrix);
   }
 

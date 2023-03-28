@@ -41,7 +41,7 @@ export class MeshBuilder {
     this.clear();
   }
 
-  private clear() {
+  clear() {
     this._vertices = new Array();
     this._normals = new Array();
     this._indices = new Array();
