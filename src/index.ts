@@ -73,7 +73,7 @@ async function main() {
 
   let scene = new SceneNode();
   let camera = new Camera();
-  quat.fromEuler({x:0,y:0,z:90*DEG2RAD}).store(camera.transform.local.rotation);
+  // quat.fromEuler({x:0,y:0,z:90*DEG2RAD}).store(camera.transform.local.rotation);
   camera.transform.local.position.z = -10;
   scene.add(camera);
   
@@ -181,7 +181,7 @@ async function main() {
     }
   }
 
-  gridMesh(mb, 10, 10, 0.001, {r:0.5,g:1,b:0.5,a:1});
+  gridMesh(mb, 10, 10, 0.005, {r:0.5,g:1,b:0.5,a:1});
   mb.build({
     gl,
     output: {

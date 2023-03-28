@@ -3,7 +3,7 @@ import { Camera } from "./graph/camera.js";
 import { MeshNode } from "./graph/meshnode.js";
 import { SceneNode } from "./graph/scene.js";
 import { hsvToRgb } from "./math/color.js";
-import { DEG2RAD, lerp } from "./math/general.js";
+import { lerp } from "./math/general.js";
 import { quat } from "./math/quaternion.js";
 import { MeshBuilder } from "./meshbuilder.js";
 import { Shader } from "./shader.js";
@@ -69,11 +69,7 @@ async function main() {
   shader.createProgram(gl);
   let scene = new SceneNode();
   let camera = new Camera();
-  quat.fromEuler({
-    x: 0,
-    y: 0,
-    z: 90 * DEG2RAD
-  }).store(camera.transform.local.rotation);
+  // quat.fromEuler({x:0,y:0,z:90*DEG2RAD}).store(camera.transform.local.rotation);
   camera.transform.local.position.z = -10;
   scene.add(camera);
   let mb = new MeshBuilder();
@@ -162,7 +158,7 @@ async function main() {
       mb.colors(color, color, color, color);
     }
   }
-  gridMesh(mb, 10, 10, 0.001, {
+  gridMesh(mb, 10, 10, 0.005, {
     r: 0.5,
     g: 1,
     b: 0.5,

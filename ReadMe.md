@@ -18,37 +18,34 @@ shader.createProgram(gl);
 
 //create a mesh with default geometry
 //just a triangle to start with
-let mesh = new Mesh(gl, shader, [
-  0.0, 0.5, 0.0,
-  -0.5, -0.5, 0.0,
-  0.5, -0.5, 0.0,
-], [
-  0, 1, 2,
-], [
-  1, 0, 0, 1,
-  0, 1, 0, 1,
-  0, 0, 1, 1
-]);
+let mesh = new Mesh();
+mesh.shader = shader;
+mesh.init();
 
 //demo updating mesh data on the fly
 setTimeout(() => {
 
   //similar to mesh constructor, but just updates mesh with new data
   //this time it will be a square
-  mesh.updateVertexData(gl, [
+  mesh.vertices = new Float32Array([
     -1, 1, 0,
     -1, -1, 0,
     1, 1, 0,
     1, -1, 0
-  ], [
+  ]);
+  mesh.indices = new Uint16Array([
     0, 1, 2,
     1, 3, 2
-  ], [
+  ]);
+  mesh.colors = new Float32Array([
     1, 0, 0, 1,
     0, 1, 0, 1,
     0, 0, 1, 1,
     1, 0, 0, 1
   ]);
+
+  //tell mesh we want to update the GPU with our CPU data
+  mesh.updateVertexData(gl);
 
 }, 5000);
 
@@ -69,6 +66,22 @@ function render() {
 requestAnimationFrame(render);
 
 ```
+
+## Implemented
+### Render helpers
+- [Mesh](./src/mesh.ts) - bare bones interface, handles sync between CPU and GPU data
+- [Shader](./src/shader.ts) - bare bones shader, will be extended later to make dynamic shader compilation
+- [MeshBuilder](./src/meshbuilder.ts) - basic mesh data generation
+### Math
+- [vector](./src/math/vector.ts) - vector math
+- [quaternion](./src/math/quaternion.ts) - minimal quaternion math
+- [matrix](./src/math/matrix.ts) - mat4 math
+- [color](./src/math/color.ts) - minimal color math
+### Scene Graph
+- [node](./src/graph/node.ts) - generic empty object, has children, global and local transforms, render recursion
+- [scenenode](./src/graph/scene.ts) - provides render()
+- [camera](./src/graph/camera.ts) - ortho and perspective all-in-one camera node
+- [meshnode](./src/graph/meshnode.ts) - render a mesh as a node automatically
 
 ## Building
 1. Clone the project -> `git clone https://github.com/roguecircuitry/ez3d`
