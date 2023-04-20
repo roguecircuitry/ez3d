@@ -1,17 +1,20 @@
 
 import type { Scene } from "../../graph/scene";
 
-import { Component } from "../component.js";
 import { DEG2RAD } from "../../math/general.js";
 import { mat4, Mat4Like } from "../../math/matrix.js";
+import { Component } from "../component.js";
 import { TransformComponent } from "./transform.js";
-import { Entity } from "../entity";
 
 export type CameraType = "orthographic"|"perspective";
 
 export class CameraComponent extends Component {
 
   transform: TransformComponent;
+
+  mounted () {
+    this.transform = this.requireComponent(TransformComponent);
+  }
 
   private _type: CameraType;
   get type () {
@@ -114,10 +117,8 @@ export class CameraComponent extends Component {
     return this;
   }
 
-  constructor (entity: Entity) {
-    super(entity);
-
-    this.transform = this.requireComponent(TransformComponent);
+  constructor () {
+    super();
 
     this.projectionMatrix = mat4.create();
     this._viewProjectionMatrix = mat4.create();

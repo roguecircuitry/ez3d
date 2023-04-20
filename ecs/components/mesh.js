@@ -12,11 +12,13 @@ export class MeshComponent extends Component {
   init(gl) {
     return this.mesh.init(gl);
   }
-  constructor(entity) {
-    super(entity);
+  constructor() {
+    super();
     this.mesh = new Mesh();
-    this.transform = this.requireComponent(TransformComponent);
     this.tvpMatrix = mat4.create();
+  }
+  mounted() {
+    this.transform = this.requireComponent(TransformComponent);
   }
   update(scene) {
     if (!scene.mainCamera) {

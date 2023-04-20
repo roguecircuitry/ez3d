@@ -21,15 +21,19 @@ export class MeshComponent extends Component {
 
   tvpMatrix: Mat4Like;
 
-  constructor (entity: Entity) {
-    super(entity);
+  constructor () {
+    super();
 
     this.mesh = new Mesh();
 
-    this.transform = this.requireComponent(TransformComponent);
-
+    
     this.tvpMatrix = mat4.create();
   }
+  
+  mounted () {
+    this.transform = this.requireComponent(TransformComponent);
+  }
+  
   update (scene: Scene): void {
     if (!scene.mainCamera) {
       console.warn("cannot render mesh, no camera yet");

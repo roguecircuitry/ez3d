@@ -11,6 +11,13 @@ export class Component {
     return this.entity !== null;
   }
 
+  mounted () {
+
+  }
+  unmounted () {
+
+  }
+
   // get requireComponent () {
   //   return this.entity.requireComponent;
   // }
@@ -40,8 +47,8 @@ export class Component {
     return this.entity.createComponent(t);
   }
   /**Can be forced by sublcass by removing ? when entity reference is needed in its constructor, such as calls to requireComponent*/
-  constructor (entity?: Entity|null) {
-    this.entity = entity;
+  constructor () {
+    this.entity = null;
   }
 
   update (scene: Scene) {

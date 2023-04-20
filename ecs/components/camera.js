@@ -1,8 +1,11 @@
-import { Component } from "../component.js";
 import { DEG2RAD } from "../../math/general.js";
 import { mat4 } from "../../math/matrix.js";
+import { Component } from "../component.js";
 import { TransformComponent } from "./transform.js";
 export class CameraComponent extends Component {
+  mounted() {
+    this.transform = this.requireComponent(TransformComponent);
+  }
   get type() {
     return this._type;
   }
@@ -85,9 +88,8 @@ export class CameraComponent extends Component {
     this._type = "orthographic";
     return this;
   }
-  constructor(entity) {
-    super(entity);
-    this.transform = this.requireComponent(TransformComponent);
+  constructor() {
+    super();
     this.projectionMatrix = mat4.create();
     this._viewProjectionMatrix = mat4.create();
     this.setPerspective(70 * DEG2RAD, 1, 0.1, 100);

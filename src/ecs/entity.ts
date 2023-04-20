@@ -39,6 +39,7 @@ export class Entity {
         } else {
           c.entity = this;
           this.components.add(c);
+          c.mounted();
         }
       }
     }
@@ -49,6 +50,7 @@ export class Entity {
       if (this.components.has(c)) {
         c.entity = null;
         this.components.delete(c);
+        c.unmounted();
       }
     }
     return this;
