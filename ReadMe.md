@@ -9,6 +9,8 @@ The library is not ready for any kind of production yet, but feel free to poke a
 ## Example
 See [index.ts](./index.ts) for more in depth example
 
+Note: code in readme will be outdated due to changing nature of this API
+
 ```ts
 
 const gl = canvas.getContext("webgl2");
@@ -77,11 +79,11 @@ requestAnimationFrame(render);
 - [quaternion](./src/math/quaternion.ts) - minimal quaternion math
 - [matrix](./src/math/matrix.ts) - mat4 math
 - [color](./src/math/color.ts) - minimal color math
-### Scene Graph
-- [node](./src/graph/node.ts) - generic empty object, has children, global and local transforms, render recursion
-- [scenenode](./src/graph/scene.ts) - provides render()
-- [camera](./src/graph/camera.ts) - ortho and perspective all-in-one camera node
-- [meshnode](./src/graph/meshnode.ts) - render a mesh as a node automatically
+### ECS / SceneGraph
+- [component](./src/ecs/component.ts) - base component class all components share
+- [transform](./src/ecs/components/transform.ts) - transform component, also keeps track of children/scene graph
+- [camera](./src/ecs/components/camera.ts) - camera component supporting ortho and perspective
+- [mesh](./src/ecs/components/mesh.ts) - mesh component capable of rendering (probably rename to mesh renderer component)
 
 ## Building
 1. Clone the project -> `git clone https://github.com/roguecircuitry/ez3d`
