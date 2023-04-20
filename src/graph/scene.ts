@@ -1,11 +1,19 @@
 
-import { Node, RenderConfig } from "./node.js";
+import type { CameraComponent } from "../ecs/components/camera";
+import type { Entity } from "../ecs/entity";
 
-export class SceneNode extends Node{
-  constructor () {
-    super();
-  }
-  render (cfg: RenderConfig) {
-    super._render(cfg);
-  }
+export interface Scene {
+  ctx: WebGLRenderingContext;
+  mainCamera?: CameraComponent;
+  children: Set<Entity>;
+  delta: number;
+}
+
+export function createScene (ctx: WebGLRenderingContext): Scene {
+  return {
+    ctx,
+    mainCamera: undefined,
+    children: new Set(),
+    delta: 0
+  };
 }

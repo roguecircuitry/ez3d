@@ -197,7 +197,6 @@ export class Mesh {
 
   /**Render the mesh*/
   public draw(gl: WebGLRenderingContext, uTransViewProjMat4: Mat4Like): boolean {
-
     if (!this.shader) return false;
 
     // Use the program

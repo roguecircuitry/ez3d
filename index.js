@@ -1,11 +1,11 @@
 import { exponent, UIBuilder } from "@roguecircuitry/htmless";
-import { Camera } from "./graph/camera.js";
-import { MeshNode } from "./graph/meshnode.js";
-import { SceneNode } from "./graph/scene.js";
+import { CameraComponent } from "./ecs/components/camera.js";
+import { MeshComponent } from "./ecs/components/mesh.js";
 import { hsvToRgb } from "./math/color.js";
 import { lerp } from "./math/general.js";
 import { quat } from "./math/quaternion.js";
 import { MeshBuilder } from "./meshbuilder.js";
+import { createScene, Entity, TransformComponent } from "./mod.js";
 import { Shader } from "./shader.js";
 import { CONSTS, debounce, resize } from "./utils.js";
 async function main() {
@@ -67,16 +67,22 @@ async function main() {
 
   //compile the shader, creates 'program' member used by webgl
   shader.createProgram(gl);
-  let scene = new SceneNode();
-  let camera = new Camera();
+  const scene = createScene(gl);
+  const cameraEntity = new Entity();
+  const cameraTransform = cameraEntity.createComponent(TransformComponent);
+  const camera = cameraEntity.createComponent(CameraComponent);
+  scene.children.add(cameraEntity);
+  scene.mainCamera = camera;
+
   // quat.fromEuler({x:0,y:0,z:90*DEG2RAD}).store(camera.transform.local.rotation);
   camera.transform.local.position.z = -10;
-  scene.add(camera);
-  let mb = new MeshBuilder();
-  let gridnode = new MeshNode();
-  gridnode.mesh.shader = shader;
-  gridnode.mesh.init(gl);
-  function gridMesh(mb, size = 10, divs = 10, lineWidth = 0.1, color = {
+  const grid = new Entity();
+  const gridTransform = grid.createComponent(TransformComponent);
+  const gridMesh = grid.createComponent(MeshComponent);
+  const mb = new MeshBuilder();
+  gridMesh.shader = shader;
+  gridMesh.init(gl);
+  function createGridMesh(mb, size = 10, divs = 10, lineWidth = 0.1, color = {
     r: 0.5,
     g: 0.5,
     b: 0.5,
@@ -158,7 +164,7 @@ async function main() {
       mb.colors(color, color, color, color);
     }
   }
-  gridMesh(mb, 10, 10, 0.005, {
+  createGridMesh(mb, 10, 10, 0.005, {
     r: 0.5,
     g: 1,
     b: 0.5,
@@ -167,19 +173,20 @@ async function main() {
   mb.build({
     gl,
     output: {
-      mesh: gridnode.mesh,
+      mesh: gridMesh.mesh,
       vertices: true,
       indices: true,
       colors: true
     }
   });
-  scene.add(gridnode);
+  scene.children.add(grid);
   mb.clear();
-  let meshnode = new MeshNode();
-  let mesh = meshnode.mesh;
-  mesh.shader = shader;
-  mesh.init(gl);
-  scene.add(meshnode);
+  const colorwheel = new Entity();
+  const colorwheelTransform = colorwheel.createComponent(TransformComponent);
+  const colorwheelMesh = colorwheel.createComponent(MeshComponent);
+  colorwheelMesh.shader = shader;
+  colorwheelMesh.init(gl);
+  scene.children.add(colorwheel);
   let radius = 0.5;
   let divisions = 64;
   mb.verts({
@@ -232,7 +239,7 @@ async function main() {
     mb.build({
       gl,
       output: {
-        mesh,
+        mesh: colorwheelMesh.mesh,
         colors: true,
         indices: true,
         normals: false,
@@ -241,11 +248,6 @@ async function main() {
       }
     });
   }, 500);
-  let renderConfig = {
-    camera,
-    gl,
-    scene
-  };
   let r = 0;
   function render() {
     //set the clear color
@@ -261,10 +263,10 @@ async function main() {
 
     // camera.transform.local.position.z = Math.sin(r);
 
-    // console.log("rot", camera.transform.local.rotation);
-
     //render the scene
-    scene.render(renderConfig);
+    for (let child of scene.children) {
+      child.update(scene);
+    }
 
     //keep drawing more frames plz
     requestAnimationFrame(render);

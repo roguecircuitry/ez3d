@@ -1,92 +1,71 @@
-
-import { DEG2RAD } from "../math/general.js";
-import { mat4, Mat4Like } from "../math/matrix.js";
-import { Node, RenderConfig } from "./node.js";
-
-export type CameraType = "orthographic"|"perspective";
-
-export class Camera extends Node {
-  private _type: CameraType;
-  get type () {
+import { Component } from "../component.js";
+import { DEG2RAD } from "../../math/general.js";
+import { mat4 } from "../../math/matrix.js";
+import { TransformComponent } from "./transform.js";
+export class CameraComponent extends Component {
+  get type() {
     return this._type;
   }
-
-  private _projectionMatrixDirty: boolean;
-  private projectionMatrix: Mat4Like;
-  private _viewProjectionMatrix: Mat4Like;
-  get viewProjectionMatrix () {
+  get viewProjectionMatrix() {
     return this._viewProjectionMatrix;
   }
-
-  private _fieldOfView: number;
-  get fieldOfView (): number {
+  get fieldOfView() {
     return this._fieldOfView;
   }
-  set fieldOfView (v: number) {
+  set fieldOfView(v) {
     if (v !== this._fieldOfView) this._projectionMatrixDirty = true;
     this._fieldOfView = v;
   }
-
-  private _aspect: number;
-  get aspect () {
+  get aspect() {
     return this._aspect;
   }
-  set aspect (v: number) {
+  set aspect(v) {
     if (v !== this._aspect) this._projectionMatrixDirty = true;
     this._aspect = v;
   }
-
-  private _near: number;
-  get near () {
+  get near() {
     return this._near;
   }
-  set near (v: number) {
+  set near(v) {
     if (v !== this._near) this._projectionMatrixDirty = true;
     this._near = v;
   }
-
-  private _far: number;
-  get far () {
+  get far() {
     return this._far;
   }
-  set far (v: number) {
+  set far(v) {
     if (v !== this._far) this._projectionMatrixDirty = true;
     this._far = v;
   }
-
-  private _left: number;
-  get left () {
+  get left() {
     return this._left;
   }
-  set left (v: number) {
+  set left(v) {
     if (this._left !== v) this._projectionMatrixDirty = true;
     this._left = v;
   }
-  private _right: number;
-  get right () {
+  get right() {
     return this._right;
   }
-  set right (v: number) {
+  set right(v) {
     if (this._right !== v) this._projectionMatrixDirty = true;
     this._right = v;
   }
-  private _top: number;
-  get top () {
+  get top() {
     return this._top;
   }
-  set top (v: number) {
+  set top(v) {
     if (this._top !== v) this._projectionMatrixDirty = true;
     this._top = v;
   }
-  private _bottom: number;
-  get bottom () {
+  get bottom() {
     return this._bottom;
   }
-  set bottom (v: number) {
+  set bottom(v) {
     if (this._bottom !== v) this._projectionMatrixDirty = true;
     this._bottom = v;
   }
-  setPerspective (fov: number, aspect: number, near: number, far: number): this {
+  setPerspective(fov, aspect, near, far) {
     this._fieldOfView = fov;
     this._aspect = aspect;
     this._near = near;
@@ -95,7 +74,7 @@ export class Camera extends Node {
     this._type = "perspective";
     return this;
   }
-  setOrthographic (left: number, right: number, top: number, bottom: number, near: number, far: number): this {
+  setOrthographic(left, right, top, bottom, near, far) {
     this._left = left;
     this._right = right;
     this._top = top;
@@ -106,14 +85,13 @@ export class Camera extends Node {
     this._type = "orthographic";
     return this;
   }
-
-  constructor () {
-    super();
+  constructor(entity) {
+    super(entity);
+    this.transform = this.requireComponent(TransformComponent);
     this.projectionMatrix = mat4.create();
     this._viewProjectionMatrix = mat4.create();
-
     this.setPerspective(70 * DEG2RAD, 1, 0.1, 100);
-    let osize = 1;
+    // let osize = 1;
     // this.setOrthographic(
     //   -osize,
     //   osize,
@@ -124,9 +102,7 @@ export class Camera extends Node {
     // );
   }
 
-  protected _render(cfg: RenderConfig): void {
-    super._render(cfg);
-    
+  update(scene) {
     if (this._projectionMatrixDirty) {
       if (this._type === "orthographic") {
         mat4.orthographic(this._left, this._right, this._bottom, this._top, this._near, this._far).store(this.projectionMatrix);
@@ -138,12 +114,7 @@ export class Camera extends Node {
     }
 
     //calculate view + projection matrix
-    // console.log("cam proj", ...this.projectionMatrix);
-
-    mat4
-    .copy(this.projectionMatrix)
-    .mul(this.transform.global.matrix)
-    .store(this._viewProjectionMatrix);
+    mat4.copy(this.projectionMatrix).mul(this.transform.global.matrix).store(this._viewProjectionMatrix);
     // console.log(...this._viewProjectionMatrix);
   }
 }
