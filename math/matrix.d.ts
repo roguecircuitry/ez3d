@@ -1,0 +1,29 @@
+/**
+ * Say, a lot of this code is straight from gl-matrix.. why not just import that?
+ *
+ * 1. mat4.js at time of writting has 2180 LOC, this file is 354 LOC
+ * 2. Easier to use when you have to crawl thru it
+ * 3. the style here is a bit different, less intermediary variables to track in your code
+ * 4. some parts missing, such as rotating matrix by quaternion, are added here added by ChatGPT - and no, i dont want to create an intermediate rotation matrix
+*/
+import { QuaternionLike } from "./quaternion.js";
+import { Vec3Like } from "./vector.js";
+export declare type Mat4Like = Float32Array;
+export declare const Mat4FloatCount = 16;
+export declare const mat4: {
+    m: Float32Array;
+    create(): Mat4Like;
+    store(m: Mat4Like, offset?: number): any;
+    copy(m: Mat4Like, offset?: number): any;
+    identity(): any;
+    mul(m: Mat4Like): any;
+    translate(v: Vec3Like): any;
+    scale(v: Vec3Like): any;
+    rotate(q: QuaternionLike): any;
+    /**Calculates transformation matrix from values, arguments are inputs*/
+    fromTRS(t: Vec3Like, r: QuaternionLike, s: Vec3Like): any;
+    /**Calculates t,r,s from matrix values, arguments are outputs*/
+    toTRS(t: Vec3Like, r: QuaternionLike, s: Vec3Like): any;
+    perspective(fovy?: number, aspect?: number, near?: number, far?: number): any;
+    orthographic(left: number, right: number, bottom: number, top: number, near: number, far: number): any;
+};

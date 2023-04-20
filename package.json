@@ -1,8 +1,8 @@
 {
   "name": "@roguecircuitry/ez3d",
-  "version": "1.0.0",
-  "description": "TypeScript, ES Modules, import map, import map polyfill, and babel",
-  "main": "index.js",
+  "version": "1.0.1",
+  "description": "Another minimal WebGL library",
+  "main": "./mod.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/roguecircuitry/ez3d.git"
@@ -11,7 +11,8 @@
     "typescript",
     "esmodules",
     "babel",
-    "template"
+    "minimal",
+    "webgl"
   ],
   "author": "Jonathan Crowder",
   "license": "Unlicense",
@@ -30,7 +31,7 @@
   "scripts": {
     "build": "babel src --extensions .ts --copy-files -d .",
     "build-types": "npx tsc --project tsconfig.json",
-    "publish": "npm publish --access public"
+    "pub": "npm publish --access public"
   },
   "dependencies": {
   }
