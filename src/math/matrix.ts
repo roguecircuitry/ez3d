@@ -16,7 +16,26 @@ export type Mat4Like = Float32Array;
 
 export const Mat4FloatCount = 16;
 
-export const mat4 = {
+export interface Mat4Singleton {
+  m: Float32Array;
+  create(): Mat4Like;
+  store(m: Mat4Like, offset?: number): Mat4Singleton;
+  copy(m: Mat4Like, offset?: number): Mat4Singleton;
+  identity(): Mat4Singleton;
+
+  mul(m: Mat4Like): Mat4Singleton;
+  translate(v: Vec3Like): Mat4Singleton;
+  scale(v: Vec3Like): Mat4Singleton;
+  rotate(q: QuaternionLike): Mat4Singleton;
+  /**Calculates transformation matrix from values, arguments are inputs*/
+  fromTRS(t: Vec3Like, r: QuaternionLike, s: Vec3Like): Mat4Singleton;
+  /**Calculates t,r,s from matrix values, arguments are outputs*/
+  toTRS(t: Vec3Like, r: QuaternionLike, s: Vec3Like): Mat4Singleton;
+  perspective(fovy?: number, aspect?: number, near?: number, far?: number): Mat4Singleton;
+  orthographic(left: number, right: number, bottom: number, top: number, near: number, far: number): Mat4Singleton;
+}
+
+export const mat4: Mat4Singleton = {
   m: new Float32Array(Mat4FloatCount),
 
   create(): Mat4Like {

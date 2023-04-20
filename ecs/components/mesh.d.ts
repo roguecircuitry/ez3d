@@ -1,6 +1,6 @@
 import { Mat4Like } from "../../math/matrix.js";
 import { Mesh } from "../../mesh.js";
-import { Entity, Scene, Shader } from "../../mod.js";
+import { Scene, Shader } from "../../mod.js";
 import { Component } from "../component.js";
 import { TransformComponent } from "./transform.js";
 export declare class MeshComponent extends Component {
@@ -10,6 +10,7 @@ export declare class MeshComponent extends Component {
     init(gl: WebGLRenderingContext): void;
     transform: TransformComponent;
     tvpMatrix: Mat4Like;
-    constructor(entity: Entity);
+    constructor();
+    mounted(): void;
     update(scene: Scene): void;
 }

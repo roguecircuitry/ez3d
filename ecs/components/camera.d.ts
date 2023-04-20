@@ -1,10 +1,10 @@
 import type { Scene } from "../../graph/scene";
 import { Component } from "../component.js";
 import { TransformComponent } from "./transform.js";
-import { Entity } from "../entity";
 export declare type CameraType = "orthographic" | "perspective";
 export declare class CameraComponent extends Component {
     transform: TransformComponent;
+    mounted(): void;
     private _type;
     get type(): CameraType;
     private _projectionMatrixDirty;
@@ -37,6 +37,6 @@ export declare class CameraComponent extends Component {
     set bottom(v: number);
     setPerspective(fov: number, aspect: number, near: number, far: number): this;
     setOrthographic(left: number, right: number, top: number, bottom: number, near: number, far: number): this;
-    constructor(entity: Entity);
+    constructor();
     update(scene: Scene): void;
 }
