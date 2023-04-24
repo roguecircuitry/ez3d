@@ -3,15 +3,22 @@ export const quat = {
     x: 0,
     y: 0,
     z: 0,
-    w: 0
+    w: 1
   },
-  create(x = 0, y = 0, z = 0, w = 0) {
+  create(x = 0, y = 0, z = 0, w = 1) {
     return {
       x,
       y,
       z,
       w
     };
+  },
+  identity() {
+    quat.q.x = 0;
+    quat.q.y = 0;
+    quat.q.z = 0;
+    quat.q.w = 1;
+    return quat;
   },
   copy(q) {
     quat.q.x = q.x;

@@ -22,7 +22,7 @@ export interface QuatSingleton {
 }
 
 export const quat: QuatSingleton = {
-  q: { x: 0, y: 0, z: 0, w: 0 },
+  q: { x: 0, y: 0, z: 0, w: 1 },
 
   create(x = 0, y = 0, z = 0, w = 1): QuaternionLike {
     return { x, y, z, w };
