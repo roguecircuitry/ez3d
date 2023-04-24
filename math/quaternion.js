@@ -49,18 +49,18 @@ export const quat = {
     let a = quat.q;
     let b = q;
     let out = quat.q;
-    let ax = a[0],
-      ay = a[1],
-      az = a[2],
-      aw = a[3];
-    let bx = b[0],
-      by = b[1],
-      bz = b[2],
-      bw = b[3];
-    out[0] = ax * bw + aw * bx + ay * bz - az * by;
-    out[1] = ay * bw + aw * by + az * bx - ax * bz;
-    out[2] = az * bw + aw * bz + ax * by - ay * bx;
-    out[3] = aw * bw - ax * bx - ay * by - az * bz;
+    let ax = a.x,
+      ay = a.y,
+      az = a.z,
+      aw = a.w;
+    let bx = b.x,
+      by = b.y,
+      bz = b.z,
+      bw = b.w;
+    out.x = ax * bw + aw * bx + ay * bz - az * by;
+    out.y = ay * bw + aw * by + az * bx - ax * bz;
+    out.z = az * bw + aw * bz + ax * by - ay * bx;
+    out.w = aw * bw - ax * bx - ay * by - az * bz;
     return quat;
   }
 };
