@@ -1,4 +1,5 @@
 import { IndexableFloatArray } from "./general.js";
+import type { QuaternionLike } from "./quaternion.js";
 export interface Vec2Like {
     x: number;
     y: number;
@@ -29,5 +30,6 @@ export interface VecSingleton {
     setIndex(i: number): VecSingleton;
     cross(b: Vec3Like): VecSingleton;
     lerp(o: Vec3Like, by: number): VecSingleton;
+    fromQuaternion(q: QuaternionLike): VecSingleton;
 }
 export declare const vec: VecSingleton;
