@@ -46,21 +46,14 @@ export const quat = {
     return quat;
   },
   mul(q) {
-    let a = quat.q;
-    let b = q;
-    let out = quat.q;
-    let ax = a.x,
-      ay = a.y,
-      az = a.z,
-      aw = a.w;
-    let bx = b.x,
-      by = b.y,
-      bz = b.z,
-      bw = b.w;
-    out.x = ax * bw + aw * bx + ay * bz - az * by;
-    out.y = ay * bw + aw * by + az * bx - ax * bz;
-    out.z = az * bw + aw * bz + ax * by - ay * bx;
-    out.w = aw * bw - ax * bx - ay * by - az * bz;
+    let x = quat.q.x * q.w + quat.q.w * q.x + quat.q.y * q.z - quat.q.z * q.y;
+    let y = quat.q.y * q.w + quat.q.w * q.y + quat.q.z * q.x - quat.q.x * q.z;
+    let z = quat.q.z * q.w + quat.q.w * q.z + quat.q.x * q.y - quat.q.y * q.x;
+    let w = quat.q.w * q.w - quat.q.x * q.x - quat.q.y * q.y - quat.q.z * q.z;
+    quat.q.x = x;
+    quat.q.y = y;
+    quat.q.z = z;
+    quat.q.w = w;
     return quat;
   }
 };
