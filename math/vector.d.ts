@@ -1,4 +1,5 @@
 import { IndexableFloatArray } from "./general.js";
+import { Mat4Like } from "./matrix.js";
 import type { QuaternionLike } from "./quaternion.js";
 export interface Vec2Like {
     x: number;
@@ -31,5 +32,6 @@ export interface VecSingleton {
     cross(b: Vec3Like): VecSingleton;
     lerp(o: Vec3Like, by: number): VecSingleton;
     fromQuaternion(q: QuaternionLike): VecSingleton;
+    forwardFromMatrix(matrix: Mat4Like): VecSingleton;
 }
 export declare const vec: VecSingleton;

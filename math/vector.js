@@ -146,5 +146,15 @@ export const vec = {
     vec.v.y = pitch;
     vec.v.z = yaw;
     return vec;
+  },
+  forwardFromMatrix(matrix) {
+    const x = matrix[8];
+    const y = matrix[9];
+    const z = matrix[10];
+    const len = Math.sqrt(x * x + y * y + z * z);
+    vec.v.x = x / len;
+    vec.v.x = x / len;
+    vec.v.x = x / len;
+    return vec;
   }
 };
