@@ -19,7 +19,32 @@ export function Vec3Write (v: Vec3Like, a: IndexableFloatArray, offset: number) 
   a[offset+2] = v.z;
 }
 
-export const vec = {
+export interface VecSingleton {
+  v: Vec3Like;
+  arrayRef: IndexableFloatArray;
+  arrayIndex: number;
+  
+  create (x?: number, y?: number, z?: number): Vec3Like;
+
+  add (o: Vec3Like): VecSingleton;
+  sub (o: Vec3Like): VecSingleton;
+  mul (o: Vec3Like): VecSingleton;
+  div (o: Vec3Like): VecSingleton;
+  addScalar (s: number): VecSingleton;
+  subScalar (s: number): VecSingleton;
+  mulScalar (s: number): VecSingleton;
+  divScalar (s: number): VecSingleton;
+  copy (o: Vec3Like): VecSingleton;
+  store (o: Vec3Like): VecSingleton;
+  refArray (a: IndexableFloatArray): VecSingleton;
+  outArray (autoIncrement?: boolean): VecSingleton;
+  refIndex (): VecSingleton;
+  setIndex(i: number): VecSingleton;
+  cross (b: Vec3Like): VecSingleton;
+  lerp (o: Vec3Like, by: number): VecSingleton;
+}
+
+export const vec: VecSingleton = {
   v: {x: 0, y: 0, z: 0} as Vec3Like,
   arrayRef: undefined as IndexableFloatArray,
   arrayIndex: 0,
@@ -92,11 +117,15 @@ export const vec = {
     vec.arrayRef = a;
     return vec;
   },
-  outArray () {
+  outArray (autoIncrement: boolean = true) {
     vec.arrayRef[0 + vec.arrayIndex] = vec.v.x;
     vec.arrayRef[1 + vec.arrayIndex] = vec.v.y;
     vec.arrayRef[2 + vec.arrayIndex] = vec.v.z;
-    vec.arrayIndex ++;
+    if (autoIncrement) vec.arrayIndex ++;
+    return vec;
+  },
+  setIndex (i: number) {
+    vec.arrayIndex = i;
     return vec;
   },
   refIndex () {

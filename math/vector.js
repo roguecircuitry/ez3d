@@ -87,11 +87,15 @@ export const vec = {
     vec.arrayRef = a;
     return vec;
   },
-  outArray() {
+  outArray(autoIncrement = true) {
     vec.arrayRef[0 + vec.arrayIndex] = vec.v.x;
     vec.arrayRef[1 + vec.arrayIndex] = vec.v.y;
     vec.arrayRef[2 + vec.arrayIndex] = vec.v.z;
-    vec.arrayIndex++;
+    if (autoIncrement) vec.arrayIndex++;
+    return vec;
+  },
+  setIndex(i) {
+    vec.arrayIndex = i;
     return vec;
   },
   refIndex() {

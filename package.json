@@ -1,6 +1,6 @@
 {
   "name": "@roguecircuitry/ez3d",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Another minimal WebGL library",
   "main": "./mod.js",
   "repository": {
