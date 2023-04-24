@@ -118,5 +118,33 @@ export const vec = {
     vec.v.y = lerp(vec.v.y, o.y, by);
     vec.v.z = lerp(vec.v.z, o.z, by);
     return vec;
+  },
+  fromQuaternion(q) {
+    // Extract components from quaternion
+    const x = q.x;
+    const y = q.y;
+    const z = q.z;
+    const w = q.w;
+
+    // Calculate Euler angles
+    const sinr_cosp = 2 * (w * x + y * z);
+    const cosr_cosp = 1 - 2 * (x * x + y * y);
+    const roll = Math.atan2(sinr_cosp, cosr_cosp);
+    const sinp = 2 * (w * y - z * x);
+    let pitch;
+    if (Math.abs(sinp) >= 1) {
+      pitch = Math.sign(sinp) * Math.PI / 2; // use 90 degrees if out of range
+    } else {
+      pitch = Math.asin(sinp);
+    }
+    const siny_cosp = 2 * (w * z + x * y);
+    const cosy_cosp = 1 - 2 * (y * y + z * z);
+    const yaw = Math.atan2(siny_cosp, cosy_cosp);
+
+    // Return Euler angles in XYZ order
+    vec.v.x = roll;
+    vec.v.y = pitch;
+    vec.v.z = yaw;
+    return vec;
   }
 };
