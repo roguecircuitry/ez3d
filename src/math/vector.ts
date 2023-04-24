@@ -1,5 +1,6 @@
 
 import { IndexableFloatArray, lerp } from "./general.js";
+import { Mat4Like } from "./matrix.js";
 import type { QuaternionLike } from "./quaternion.js";
 
 export interface Vec2Like {
@@ -44,6 +45,7 @@ export interface VecSingleton {
   cross(b: Vec3Like): VecSingleton;
   lerp(o: Vec3Like, by: number): VecSingleton;
   fromQuaternion(q: QuaternionLike): VecSingleton;
+  forwardFromMatrix (matrix: Mat4Like): VecSingleton;
 }
 
 export const vec: VecSingleton = {
@@ -179,6 +181,16 @@ export const vec: VecSingleton = {
     vec.v.x = roll;
     vec.v.y = pitch;
     vec.v.z = yaw;
+    return vec;
+  },
+  forwardFromMatrix (matrix: Mat4Like) {
+    const x = matrix[8];
+    const y = matrix[9];
+    const z = matrix[10];
+    const len = Math.sqrt(x * x + y * y + z * z);
+    vec.v.x = x/len;
+    vec.v.x = x/len;
+    vec.v.x = x/len;
     return vec;
   }
 };
